@@ -9,16 +9,12 @@ function DropdownModule.Add(Library, card, lbl, options, defaultIdx, cb)
     local row = Library.New("Frame", {
         Size = UDim2.new(1, 0, 0, 40),
         BackgroundColor3 = T.panel2,
-        BackgroundTransparency = 0.54,
         BorderSizePixel = 0,
         ClipsDescendants = true,
         ZIndex = 5,
         Parent = card,
     })
-    Library.Cor(row, 13)
-    local rowStroke = Library.Stk(row, T.border, 1)
-    rowStroke.Transparency = 0.9
-    Library:Reg(rowStroke, "Color", "border")
+    Library.Cor(row, 10)
     Library:Reg(row, "BackgroundColor3", "panel2")
 
     local header = Library.New("Frame", {
@@ -47,7 +43,6 @@ function DropdownModule.Add(Library, card, lbl, options, defaultIdx, cb)
         Position = UDim2.new(1, -10, 0.5, 0),
         Size = UDim2.new(0, 120, 0, 26),
         BackgroundColor3 = T.card,
-        BackgroundTransparency = 0.4,
         BorderSizePixel = 0,
         Text = (options[currIdx] or "") .. "  v",
         TextColor3 = T.acc,
@@ -56,7 +51,7 @@ function DropdownModule.Add(Library, card, lbl, options, defaultIdx, cb)
         ZIndex = 6,
         Parent = header,
     })
-    Library.Cor(selectBtn, 10)
+    Library.Cor(selectBtn, 8)
     Library:Reg(selectBtn, "BackgroundColor3", "card")
     Library:Reg(selectBtn, "TextColor3", "acc")
 
@@ -79,7 +74,7 @@ function DropdownModule.Add(Library, card, lbl, options, defaultIdx, cb)
         for i, b in ipairs(optButtons) do
             local sel = (i == currIdx)
             b.BackgroundColor3 = sel and T.acc or T.card
-            b.TextColor3 = sel and T.text or T.sub
+            b.TextColor3 = sel and Color3.fromRGB(255, 255, 255) or T.sub
         end
     end
 
@@ -89,7 +84,6 @@ function DropdownModule.Add(Library, card, lbl, options, defaultIdx, cb)
             AnchorPoint = Vector2.new(0.5, 0),
             Position = UDim2.new(0.5, 0, 0, 0),
             BackgroundColor3 = T.card,
-            BackgroundTransparency = 0.4,
             BorderSizePixel = 0,
             Text = opt,
             TextColor3 = T.sub,
@@ -98,7 +92,7 @@ function DropdownModule.Add(Library, card, lbl, options, defaultIdx, cb)
             ZIndex = 7,
             Parent = optionsHolder,
         })
-        Library.Cor(optBtn, 9)
+        Library.Cor(optBtn, 8)
         table.insert(optButtons, optBtn)
 
         optBtn.MouseButton1Click:Connect(function()
