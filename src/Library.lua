@@ -1,15 +1,14 @@
 --!nocheck
 -- ============================================================
---  AVA UI  ·  Liquid Glass
---  Translucent surfaces, soft motion, and automatic category icons
+--  IMPERIAL UI  ·  Library.lua  (rediseño 2026)
+--  Themes + Chamfer (esquinas mochadas) + Registry en vivo
 -- ============================================================
 local Players = game:GetService("Players")
 local TweenService = game:GetService("TweenService")
 local RunService = game:GetService("RunService")
 local UserInputService = game:GetService("UserInputService")
-local Lighting = game:GetService("Lighting")
 
-local GITHUB_RAW_BASE = "https://raw.githubusercontent.com/CodeVoult/AvaUI/main/elements/"
+local GITHUB_RAW_BASE = "https://raw.githubusercontent.com/CodeVoult/ImperialUI-/main/elements/"
 
 local function LoadElement(name)
     local success, result = pcall(function()
@@ -41,22 +40,6 @@ end
 --  THEMES  (agrega los tuyos aqui, todo lo demas se adapta solo)
 -- ================================================================== --
 local ThemeList = {
-    LiquidGlass = {
-        bg = Color3.fromRGB(10, 18, 31),
-        panel = Color3.fromRGB(22, 34, 53),
-        panel2 = Color3.fromRGB(43, 61, 82),
-        card = Color3.fromRGB(49, 68, 91),
-        border = Color3.fromRGB(235, 245, 255),
-        acc = Color3.fromRGB(139, 194, 255),
-        acc2 = Color3.fromRGB(92, 153, 222),
-        text = Color3.fromRGB(246, 250, 255),
-        sub = Color3.fromRGB(176, 194, 215),
-        sep = Color3.fromRGB(74, 94, 117),
-        switchOff = Color3.fromRGB(61, 78, 99),
-        red = Color3.fromRGB(255, 112, 125),
-        green = Color3.fromRGB(111, 231, 176),
-        grad = { Color3.fromRGB(206, 231, 255), Color3.fromRGB(115, 177, 239), Color3.fromRGB(83, 118, 170) },
-    },
     Venom = { -- azul original, pulido
         bg = Color3.fromRGB(10, 18, 32),
         panel = Color3.fromRGB(6, 13, 26),
@@ -125,52 +108,10 @@ local ThemeList = {
 Library.ThemeList = ThemeList
 
 local T = {}
-for k, v in pairs(ThemeList.LiquidGlass) do T[k] = v end
-T.bgTrans = 0.5
-T.glassTrans = 0.5
-T.tabSize = 214
+for k, v in pairs(ThemeList.Venom) do T[k] = v end
+T.bgTrans = 0.06
+T.tabSize = 200
 Library.T = T
-
--- Text glyphs are used for named categories; numeric/asset IDs remain supported.
-local IconCatalog = {
-    { terms = { "combat", "combate", "fight", "fighting", "battle", "attack", "melee", "sword", "lucha", "pelea" }, glyph = "⚔" },
-    { terms = { "aim", "target", "aimbot", "silent", "objetivo", "apuntar", "mira" }, glyph = "◎" },
-    { terms = { "visual", "visuals", "visuales", "esp", "render", "overlay" }, glyph = "◉" },
-    { terms = { "movement", "move", "walk", "speed", "flight", "fly", "movimiento", "movilidad" }, glyph = "↗" },
-    { terms = { "player", "players", "character", "avatar", "jugador", "personaje" }, glyph = "●" },
-    { terms = { "world", "environment", "map", "sky", "mundo", "entorno", "mapa" }, glyph = "◈" },
-    { terms = { "setting", "settings", "config", "configuration", "option", "options", "ajustes", "configuracion", "configuración", "opciones" }, glyph = "⚙" },
-    { terms = { "utility", "utilities", "misc", "other", "utilidad", "herramientas", "otros" }, glyph = "⊞" },
-    { terms = { "home", "main", "general", "inicio", "principal" }, glyph = "⌂" },
-    { terms = { "security", "shield", "protect", "seguridad", "proteccion", "protección" }, glyph = "◇" },
-}
-
-Library.IconMap = IconCatalog
-
-function Library.ResolveIcon(iconOrCategory, fallbackCategory)
-    local value = tostring(iconOrCategory or "")
-    local numericId = tonumber(value)
-    if numericId then
-        return { Kind = "Image", Value = "rbxassetid://" .. tostring(numericId) }
-    end
-    if string.match(value, "^rbxassetid://") then
-        return { Kind = "Image", Value = value }
-    end
-
-    local search = string.lower(value .. " " .. tostring(fallbackCategory or ""))
-    for _, entry in ipairs(IconCatalog) do
-        for _, term in ipairs(entry.terms) do
-            if string.find(search, term, 1, true) then
-                return { Kind = "Text", Value = entry.glyph }
-            end
-        end
-    end
-    return { Kind = "Text", Value = "◈" }
-end
-
-function Library.GetIcon(category)
-    return Library.ResolveIcon(category).Value
-end
 
 -- ================================================================== --
 --  HELPERS
@@ -306,7 +247,7 @@ end
 -- ================================================================== --
 --  VENTANA
 -- ================================================================== --
-function Library:CreateWindow(hubTitle, themeName, blurIntensity)
+function Library:CreateWindow(hubTitle, themeName)
     local self = setmetatable({}, Library)
     self.LogoLocked = false
     self.Pages = {}
@@ -314,52 +255,21 @@ function Library:CreateWindow(hubTitle, themeName, blurIntensity)
     self.ActivePage = nil
     self._themed = {}
     self.T = T
-    self.ThemeName = "LiquidGlass"
-    for k, v in pairs(ThemeList.LiquidGlass) do T[k] = v end
-    T.bgTrans = 0.5
-    T.glassTrans = 0.5
-    T.tabSize = 214
+    self.ThemeName = "Venom"
     if themeName and ThemeList[themeName] then
         for k, v in pairs(ThemeList[themeName]) do T[k] = v end
         self.ThemeName = themeName
     end
 
-    local cleanTitle = hubTitle and string.gsub(tostring(hubTitle), "<[^>]*>", "") or "AVA UI"
-    self.WindowTitle = cleanTitle
-
-    local guiParent = gethui and gethui() or game:GetService("CoreGui")
-    local previousGui = guiParent:FindFirstChild("AVA_LIQUID_GLASS")
-    if previousGui then previousGui:Destroy() end
+    local cleanTitle = hubTitle and string.gsub(hubTitle, "<[^>]*>", "") or "Imperial UI"
 
     self.GUI = New("ScreenGui", {
-        Name = "AVA_LIQUID_GLASS",
+        Name = "DDOS_VENOM",
         ResetOnSpawn = false,
         DisplayOrder = 999999999,
         IgnoreGuiInset = true,
-        Parent = guiParent,
+        Parent = (gethui and gethui() or game:GetService("CoreGui")),
     })
-
-    local previousBlur = Lighting:FindFirstChild("AVA_UI_Blur")
-    if previousBlur then previousBlur:Destroy() end
-    self.BlurIntensity = math.clamp(tonumber(blurIntensity) or 28, 0, 56)
-    self.Blur = New("BlurEffect", {
-        Name = "AVA_UI_Blur",
-        Size = 0,
-        Parent = Lighting,
-    })
-    self.OnWindowOpened = function()
-        if self.Blur and self.Blur.Parent then
-            Tween(self.Blur, 0.36, { Size = self.BlurIntensity })
-        end
-    end
-    self.OnWindowClosed = function()
-        if self.Blur and self.Blur.Parent then
-            Tween(self.Blur, 0.3, { Size = 0 })
-        end
-    end
-    self.GUI.Destroying:Connect(function()
-        if self.Blur and self.Blur.Parent then self.Blur:Destroy() end
-    end)
 
     -- Sonido de clic (una sola conexion por boton)
     local clickSound = Instance.new("Sound")
@@ -388,56 +298,31 @@ function Library:CreateWindow(hubTitle, themeName, blurIntensity)
     })
     List(self.NotifLayer, Enum.FillDirection.Vertical, 8)
 
-    -- Floating glass launcher
+    -- Icono flotante (chamfered, estilo gaming)
     self.FloatIcon = New("TextButton", {
         Name = "FloatIcon",
         AnchorPoint = Vector2.new(0.5, 0.5),
-        Size = UDim2.new(0, 156, 0, 48),
+        Size = UDim2.new(0, 150, 0, 44),
         Position = UDim2.new(0.5, 0, 0, 60),
-        BackgroundColor3 = T.panel2,
-        BackgroundTransparency = 0.18,
+        BackgroundColor3 = T.acc,
         BorderSizePixel = 0,
         Text = "",
         AutoButtonColor = false,
         ZIndex = 999999990,
         Parent = self.GUI,
     })
-    Cor(self.FloatIcon, 24)
-    local floatStroke = Stk(self.FloatIcon, T.border, 1)
-    floatStroke.Transparency = 0.72
-    self:Reg(floatStroke, "Color", "border")
-
-    local floatMark = New("Frame", {
-        Position = UDim2.new(0, 9, 0.5, -15),
-        Size = UDim2.new(0, 30, 0, 30),
-        BackgroundColor3 = T.acc,
-        BackgroundTransparency = 0.14,
-        BorderSizePixel = 0,
-        ZIndex = 999999991,
-        Parent = self.FloatIcon,
-    })
-    Cor(floatMark, 15)
-    self:Reg(floatMark, "BackgroundColor3", "acc")
-    New("TextLabel", {
-        Size = UDim2.fromScale(1, 1),
-        BackgroundTransparency = 1,
-        Text = "A",
-        TextColor3 = T.text,
-        Font = Enum.Font.GothamBold,
-        TextSize = 15,
-        ZIndex = 999999992,
-        Parent = floatMark,
-    })
+    local floatCovers = Chamfer(self.FloatIcon, 12, Color3.fromRGB(0, 0, 0), 999999991)
+    for _, c in ipairs(floatCovers) do c.BackgroundTransparency = 1 end -- el icono flota: sin covers
+    AccGradient(self.FloatIcon, 25)
+    self:Reg(self.FloatIcon, "BackgroundColor3", "acc")
 
     New("TextLabel", {
-        Position = UDim2.new(0, 47, 0, 0),
-        Size = UDim2.new(1, -52, 1, 0),
+        Size = UDim2.new(1, 0, 1, 0),
         BackgroundTransparency = 1,
-        Text = "AVA UI  ·  OPEN",
+        Text = "OPEN MENU",
         TextColor3 = T.text,
-        Font = Enum.Font.GothamSemibold,
-        TextSize = 12,
-        TextXAlignment = Enum.TextXAlignment.Left,
+        Font = Enum.Font.GothamBlack,
+        TextSize = 14,
         ZIndex = 999999992,
         Parent = self.FloatIcon,
     })
@@ -445,12 +330,12 @@ function Library:CreateWindow(hubTitle, themeName, blurIntensity)
     self.closeTextLabel = New("TextLabel", {
         Name = "CloseTextAnim",
         AnchorPoint = Vector2.new(0.5, 0.5),
-        Size = UDim2.new(0, 156, 0, 48),
+        Size = UDim2.new(0, 150, 0, 44),
         BackgroundTransparency = 1,
-        Text = "AVA UI  ·  OPEN",
+        Text = "OPEN MENU",
         TextColor3 = T.text,
-        Font = Enum.Font.GothamSemibold,
-        TextSize = 12,
+        Font = Enum.Font.GothamBlack,
+        TextSize = 14,
         TextTransparency = 1,
         Visible = false,
         ZIndex = 999999998,
@@ -464,7 +349,7 @@ function Library:CreateWindow(hubTitle, themeName, blurIntensity)
         Position = UDim2.new(0.5, 0, 0.5, 0),
         Size = UDim2.new(0, 150, 0, 44),
         BackgroundColor3 = T.bg,
-        BackgroundTransparency = T.glassTrans,
+        BackgroundTransparency = T.bgTrans,
         Visible = false,
         BorderSizePixel = 0,
         ClipsDescendants = true,
@@ -476,7 +361,7 @@ function Library:CreateWindow(hubTitle, themeName, blurIntensity)
     local winInner = New("Frame", {
         Size = UDim2.new(1, 0, 1, 0),
         BackgroundColor3 = T.panel,
-        BackgroundTransparency = T.glassTrans,
+        BackgroundTransparency = T.bgTrans,
         ClipsDescendants = true,
         Parent = self.WinMain,
     })
@@ -494,13 +379,14 @@ function Library:CreateWindow(hubTitle, themeName, blurIntensity)
 
     self.borderStroke = New("UIStroke", {
         Name = "BorderStroke",
-        Thickness = 1.2,
-        Color = T.border,
-        Transparency = 0.68,
+        Thickness = 2.6,
+        Color = Color3.fromRGB(255, 255, 255),
         ApplyStrokeMode = Enum.ApplyStrokeMode.Border,
         Parent = self.WinMain,
     })
-    self:Reg(self.borderStroke, "Color", "border")
+    local borderGradient = AccGradient(self.borderStroke, 225)
+    self:Reg(borderGradient, "Color", "@grad")
+    SpinGradient(borderGradient, 1.2)
 
     self.ContentGroup = New("CanvasGroup", {
         Name = "ContentGroup",
@@ -521,58 +407,19 @@ function Library:CreateWindow(hubTitle, themeName, blurIntensity)
         Parent = self.ContentGroup,
     })
 
-    local brandBadge = New("Frame", {
-        Position = UDim2.new(0, 12, 0, 10),
-        Size = UDim2.new(0, 31, 0, 31),
-        BackgroundColor3 = T.panel2,
-        BackgroundTransparency = 0.24,
-        BorderSizePixel = 0,
-        ZIndex = 6,
-        Parent = self.titleBar,
-    })
-    Cor(brandBadge, 12)
-    local brandStroke = Stk(brandBadge, T.border, 1)
-    brandStroke.Transparency = 0.82
-    self:Reg(brandStroke, "Color", "border")
-    local brandLetter = New("TextLabel", {
-        Size = UDim2.fromScale(1, 1),
-        BackgroundTransparency = 1,
-        Text = "A",
-        TextColor3 = T.acc,
-        Font = Enum.Font.GothamBold,
-        TextSize = 15,
-        ZIndex = 7,
-        Parent = brandBadge,
-    })
-    self:Reg(brandLetter, "TextColor3", "acc")
-
-    self.TitleLabel = New("TextLabel", {
-        Size = UDim2.new(1, -70, 0, 22),
-        Position = UDim2.new(0, 52, 0, 5),
+    local titleLabel = New("TextLabel", {
+        Size = UDim2.new(1, -24, 1, 0),
+        Position = UDim2.new(0, 16, 0, 0),
         BackgroundTransparency = 1,
         Text = cleanTitle,
         TextColor3 = T.text,
-        Font = Enum.Font.GothamSemibold,
-        TextSize = 17,
+        Font = Enum.Font.GothamBlack,
+        TextSize = 16,
         TextXAlignment = Enum.TextXAlignment.Left,
         ZIndex = 7,
         Parent = self.titleBar,
     })
-    self:Reg(self.TitleLabel, "TextColor3", "text")
-
-    local titleCaption = New("TextLabel", {
-        Size = UDim2.new(1, -70, 0, 14),
-        Position = UDim2.new(0, 53, 0, 27),
-        BackgroundTransparency = 1,
-        Text = "LIQUID GLASS  ·  AVA",
-        TextColor3 = T.sub,
-        Font = Enum.Font.GothamMedium,
-        TextSize = 9,
-        TextXAlignment = Enum.TextXAlignment.Left,
-        ZIndex = 7,
-        Parent = self.titleBar,
-    })
-    self:Reg(titleCaption, "TextColor3", "sub")
+    self:Reg(titleLabel, "TextColor3", "text")
 
     -- Sidebar
     self.Sidebar = New("ScrollingFrame", {
@@ -596,36 +443,23 @@ function Library:CreateWindow(hubTitle, themeName, blurIntensity)
         Position = UDim2.new(0, T.tabSize - 20, 0, 52),
         Size = UDim2.new(1, -T.tabSize + 14, 1, -58),
         BackgroundColor3 = T.panel,
-        BackgroundTransparency = 0.58,
         ClipsDescendants = true,
         ZIndex = 3,
         Parent = self.ContentGroup,
     })
     Cor(self.ContentArea, 14)
-    local contentStroke = Stk(self.ContentArea, T.border, 1)
-    contentStroke.Transparency = 0.9
-    self:Reg(contentStroke, "Color", "border")
     self:Reg(self.ContentArea, "BackgroundColor3", "panel")
 
     -- Animaciones (tu spring, intacto)
     self.Animations = SpringAnimations.Setup(self, {
-        targetWidth = 700,
-        targetHeight = 440,
+        targetWidth = 640,
+        targetHeight = 400,
     }, Spring)
 
     function self:Open() self.Animations.Open() end
     function self:Close() self.Animations.Close() end
     function self:Toggle() self.Animations.Toggle() end
     function self:IsOpen() return self.Animations.IsOpen() end
-    function self:SetTitle(title)
-        local newTitle = string.gsub(tostring(title or "AVA UI"), "<[^>]*>", "")
-        self.WindowTitle = newTitle
-        self.TitleLabel.Text = newTitle
-    end
-    function self:SetBlurIntensity(value)
-        self.BlurIntensity = math.clamp(tonumber(value) or 28, 0, 56)
-        if self:IsOpen() then self.OnWindowOpened() end
-    end
 
     -- Keybind: RightControl
     UserInputService.InputBegan:Connect(function(i, gpe)
@@ -782,10 +616,10 @@ function Library:CreateTab(name, iconId)
             Size = UDim2.new(1, -4, 0, 24),
             Position = UDim2.new(0, 4, 0, 0),
             BackgroundTransparency = 1,
-        Text = title,
+            Text = string.upper(title),
             TextColor3 = T.sub,
-        Font = Enum.Font.GothamSemibold,
-        TextSize = 13,
+            Font = Enum.Font.GothamBold,
+            TextSize = 12,
             TextXAlignment = Enum.TextXAlignment.Left,
             ZIndex = 6,
             Parent = container,
@@ -796,15 +630,11 @@ function Library:CreateTab(name, iconId)
             Size = UDim2.new(1, 0, 0, 0),
             AutomaticSize = Enum.AutomaticSize.Y,
             BackgroundColor3 = T.card,
-            BackgroundTransparency = 0.62,
             BorderSizePixel = 0,
             ZIndex = 5,
             Parent = container,
         })
-        Cor(card, 17)
-        local cardStroke = Stk(card, T.border, 1)
-        cardStroke.Transparency = 0.9
-        self:Reg(cardStroke, "Color", "border")
+        Cor(card, 14)
         self:Reg(card, "BackgroundColor3", "card")
         List(card, Enum.FillDirection.Vertical, 8)
         Pad(card, 10, 10, 10, 10)
