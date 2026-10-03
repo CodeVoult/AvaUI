@@ -7,15 +7,11 @@ function ToggleModule.Add(Library, card, lbl, def, cb)
     local row = Library.New("Frame", {
         Size = UDim2.new(1, 0, 0, 40),
         BackgroundColor3 = T.panel2,
-        BackgroundTransparency = 0.54,
         BorderSizePixel = 0,
         ZIndex = 5,
         Parent = card,
     })
-    Library.Cor(row, 13)
-    local rowStroke = Library.Stk(row, T.border, 1)
-    rowStroke.Transparency = 0.9
-    Library:Reg(rowStroke, "Color", "border")
+    Library.Cor(row, 10)
     Library:Reg(row, "BackgroundColor3", "panel2")
 
     local label = Library.New("TextLabel", {
@@ -37,7 +33,6 @@ function ToggleModule.Add(Library, card, lbl, def, cb)
         Position = UDim2.new(1, -10, 0.5, 0),
         Size = UDim2.new(0, 52, 0, 28),
         BackgroundColor3 = def and T.acc or T.switchOff,
-        BackgroundTransparency = 0.12,
         BorderSizePixel = 0,
         ZIndex = 6,
         Parent = row,
