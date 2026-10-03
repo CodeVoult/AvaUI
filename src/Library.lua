@@ -9,7 +9,7 @@ local RunService = game:GetService("RunService")
 local UserInputService = game:GetService("UserInputService")
 local Lighting = game:GetService("Lighting")
 
-local GITHUB_RAW_BASE = "https://raw.githubusercontent.com/CodeVoult/ImperialUI-/main/elements/"
+local GITHUB_RAW_BASE = "https://raw.githubusercontent.com/CodeVoult/AvaUI/main/elements/"
 
 local function LoadElement(name)
     local success, result = pcall(function()
