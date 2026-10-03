@@ -55,7 +55,6 @@ function SpringAnimations.Setup(window, config, Spring)
         if winOpen then return end
         winOpen = true
         springing = true
-        if window.OnWindowOpened then window.OnWindowOpened() end
 
         closeTextLabel.Visible = false
         closeTextLabel.TextTransparency = 1
@@ -89,7 +88,6 @@ function SpringAnimations.Setup(window, config, Spring)
         if not winOpen then return end
         winOpen = false
         springing = true
-        if window.OnWindowClosed then window.OnWindowClosed() end
 
         ContentGroup.Visible = false
         ContentGroup.GroupTransparency = 1
