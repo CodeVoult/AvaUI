@@ -8,22 +8,17 @@ function SliderModule.Add(Library, card, lbl, mn, mx, def, cb)
     local row = Library.New("Frame", {
         Size = UDim2.new(1, 0, 0, 44),
         BackgroundColor3 = T.panel2,
-        BackgroundTransparency = 0.54,
         BorderSizePixel = 0,
         ZIndex = 5,
         Parent = card,
     })
-    Library.Cor(row, 13)
-    local rowStroke = Library.Stk(row, T.border, 1)
-    rowStroke.Transparency = 0.9
-    Library:Reg(rowStroke, "Color", "border")
+    Library.Cor(row, 10)
     Library:Reg(row, "BackgroundColor3", "panel2")
 
     local valInput = Library.New("TextBox", {
         Position = UDim2.new(0, 12, 0.5, -11),
         Size = UDim2.new(0, 40, 0, 22),
         BackgroundColor3 = T.card,
-        BackgroundTransparency = 0.4,
         BorderSizePixel = 0,
         Text = tostring(def),
         TextColor3 = T.acc,
@@ -57,7 +52,6 @@ function SliderModule.Add(Library, card, lbl, mn, mx, def, cb)
         Position = UDim2.new(0, 60, 0.5, -3),
         Size = UDim2.new(1, -210, 0, 6),
         BackgroundColor3 = T.card,
-        BackgroundTransparency = 0.3,
         BorderSizePixel = 0,
         ZIndex = 6,
         Parent = row,
