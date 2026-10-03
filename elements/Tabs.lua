@@ -11,11 +11,10 @@ function TabsModule.Create(Library, name, iconId)
         BorderSizePixel = 0,
         Text = "",
         AutoButtonColor = false,
-        LayoutOrder = #Library.Tabs + 1,
         ZIndex = 4,
         Parent = Library.Sidebar,
     })
-    Library.Cor(tabBtn, 13)
+    Library.Cor(tabBtn, 10)
 
     -- barra indicadora izquierda
     local accentBar = Library.New("Frame", {
@@ -30,32 +29,15 @@ function TabsModule.Create(Library, name, iconId)
     Library.Cor(accentBar, 2)
     Library:Reg(accentBar, "BackgroundColor3", "acc")
 
-    local iconInfo = Library.ResolveIcon(iconId or name, name)
-    local iconClass = iconInfo.Kind == "Image" and "ImageLabel" or "TextLabel"
-    local iconProps = {
+    local icon = Library.New("ImageLabel", {
         Size = UDim2.new(0, 22, 0, 22),
         Position = UDim2.new(0, 12, 0.5, -11),
         BackgroundTransparency = 1,
+        Image = iconId or "",
+        ImageColor3 = T.sub,
         ZIndex = 5,
         Parent = tabBtn,
-    }
-    if iconInfo.Kind == "Image" then
-        iconProps.Image = iconInfo.Value
-        iconProps.ImageColor3 = T.sub
-    else
-        iconProps.Text = iconInfo.Value
-        iconProps.TextColor3 = T.sub
-        iconProps.Font = Enum.Font.GothamMedium
-        iconProps.TextSize = 18
-    end
-    local icon = Library.New(iconClass, iconProps)
-    local function setIconColor(color)
-        if iconInfo.Kind == "Image" then
-            icon.ImageColor3 = color
-        else
-            icon.TextColor3 = color
-        end
-    end
+    })
 
     local txt = Library.New("TextLabel", {
         Size = UDim2.new(1, -46, 1, 0),
@@ -92,25 +74,22 @@ function TabsModule.Create(Library, name, iconId)
         end
     end)
 
-    local entry = { btn = tabBtn, bar = accentBar, txt = txt, icon = icon, setIconColor = setIconColor }
+    local entry = { btn = tabBtn, bar = accentBar, txt = txt, icon = icon }
 
     local function selectTab()
         for _, t in pairs(Library.Tabs) do
             Library.Tween(t.btn, 0.2, { BackgroundTransparency = 1 })
             Library.Tween(t.bar, 0.2, { BackgroundTransparency = 1 })
             t.txt.TextColor3 = T.sub
-            t.setIconColor(T.sub)
+            t.icon.ImageColor3 = T.sub
         end
         for _, p in pairs(Library.Pages) do
             p.Visible = false
         end
-        Library.Tween(tabBtn, 0.2, {
-            BackgroundColor3 = T.panel2,
-            BackgroundTransparency = 0.42,
-        })
+        Library.Tween(tabBtn, 0.2, { BackgroundTransparency = 0 })
         Library.Tween(accentBar, 0.2, { BackgroundTransparency = 0 })
-        txt.TextColor3 = T.text
-        setIconColor(T.acc)
+        txt.TextColor3 = Color3.fromRGB(255, 255, 255)
+        icon.ImageColor3 = Color3.fromRGB(255, 255, 255)
 
         page.Visible = true
         page.Position = UDim2.new(0, 0, -0.08, 0)
